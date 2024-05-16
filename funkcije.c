@@ -7,15 +7,13 @@
 
 static int brojFilmova = 0;
 static int i;
-static int j;
-static int br = 0;
 
 int izbornik() {
 
     int izbor = 0;
     static FILM* polje = NULL;
 
-    printf("\n### IZBORNIK ###\n");
+    printf("\n######## IZBORNIK ########\n");
     printf("1. Unos novog filma\n");
     printf("2. Uredi podatke o filmu\n");
     printf("3. Ispis filmova\n");
@@ -23,14 +21,13 @@ int izbornik() {
     printf("5. Sortiranje filmova\n");
     printf("6. Brisanje filma\n");
     printf("7. Izlaz\n");
-    printf("#################\n");
+    printf("###########################\n");
 
     scanf("%d", &izbor);
     system("cls");
 
     switch (izbor) {
     case 1:
-            ucitajFilm();
             if (brojFilmova == 0) {
                 kreiranjeDat();
             }
@@ -38,15 +35,12 @@ int izbornik() {
             break;
 
     case 2:
-            urediPodatke();
+			polje = ucitajFilm();
+            urediPodatke(polje);
             break;
 
     case 3:
-            if (polje != NULL) {
-                free(polje);
-                polje = NULL;
-            }
-            polje = (FILM*)ucitajFilm();
+            polje = ucitajFilm();
             ispisiFilm(polje);
             break;
 
@@ -63,12 +57,8 @@ int izbornik() {
             break;
 
     case 6:
-            if (polje == NULL) {
-                printf("Nema unesenih filmova\n");
-            }
-            else {
-                brisanjeFilma(polje);
-            }
+			polje = ucitajFilm();
+            brisanjeFilma(polje);
             break;
 
     case 7:
@@ -88,7 +78,7 @@ int izbornikPret() {
 
     int izbor = 0;
     FILM* polje = NULL;
-    polje = (FILM*)ucitajFilm();
+    polje = ucitajFilm();
 
     printf("Pretraživanje:\n");
     printf("1. Naslov\n");
@@ -132,10 +122,10 @@ izbornikSort() {
 
     int izbor = 0;
     FILM* polje = NULL;
-    polje = (FILM*)ucitajFilm();
+    polje = ucitajFilm();
 
     printf("Sortiraj po:\n");
-    printf("1. Godini ulazno\n");
+    printf("1. Godini uzlazno\n");
     printf("2. Godini silazno\n");
     printf("3. Natrag\n");
 
@@ -164,11 +154,11 @@ izbornikSort() {
 
 void kreiranjeDat() {
 
-    FILE* fp = NULL;
-    fp = fopen("filmovi.bin", "wb");
+    FILE* fp = fopen("filmovi.bin", "wb");
 
     if (fp == NULL) {
         perror("Greška pri otvaranju datoteke");
+		exit(1);
     }
     
     fwrite(&brojFilmova, sizeof(int), 1, fp);
@@ -181,7 +171,7 @@ void unesiFilm() {
     FILE* fp = fopen("filmovi.bin", "ab");
 
     if (fp == NULL) {
-        perror("Neuspješni unos");
+        perror("Neuspjesni unos");
         exit(1);
     }
 
@@ -193,21 +183,25 @@ void unesiFilm() {
     printf("Unesite godinu izdanja filma: ");
     scanf("%d", &noviFilm.godina);
 
-    printf("Unesite žanr filma: ");
+    printf("Unesite zanr filma: ");
     scanf(" %[^\n]", noviFilm.zanr);
 
-    printf("Unesite broj gledanja filma: ");
+    printf("Gledano (da/ne): ");
     scanf(" %[^\n]", noviFilm.gledano);
 
     fwrite(&noviFilm, sizeof(FILM), 1, fp);
+	brojFilmova++;
+
+	fseek(fp, 0, SEEK_SET);
+	fwrite(&brojFilmova, sizeof(int), 1, fp);
 
     fclose(fp);
 
-    printf("Film uspješno dodan.\n");
+    printf("Film uspjesno dodan.\n");
     
 }
 
-void* ucitajFilm() {
+FILM* ucitajFilm() {
 
     FILE* fp = fopen("filmovi.bin", "rb");
     if (fp == NULL) {
@@ -217,11 +211,11 @@ void* ucitajFilm() {
 
     fread(&brojFilmova, sizeof(int), 1, fp);
     
-    FILM* polje = NULL;
-    polje = (FILM*)malloc(brojFilmova * sizeof(FILM));
+    FILM* polje = (FILM*)malloc(brojFilmova * sizeof(FILM));
 
     if (polje == NULL) {
         perror("Neuspješno zauzimanje memorije");
+		fclose(fp);
         return NULL;
     }
 
@@ -246,7 +240,10 @@ void urediPodatke(FILM* polje) {
     FILM* film = &polje[id - 1];
 
     printf("Film koji želite urediti:\n");
-    ispisiFilm(film);
+	printf("Naslov: %s\n", film->naslov);
+	printf("Godina: %d\n", film->godina);
+	printf("Zanr: %s\n", film->zanr);
+	printf("Gledano: %s\n", film->gledano);
 
     printf("Unesite nove podatke za film:\n");
     printf("Naslov: ");
@@ -255,10 +252,21 @@ void urediPodatke(FILM* polje) {
     scanf("%d", &film->godina);
     printf("Zanr: ");
     scanf(" %[^\n]s", film->zanr);
-    printf("Jeste li pogledali (da/ne): ");
+    printf("Gledano (da/ne): ");
     scanf(" %[^\n]s", &film->gledano);
 
+	FILE* fp = fopen("filmovi.bin", "rb+");
+	if (fp = NULL) {
+		perror("Neuspjesno otvaranje datoteke");
+		return;
+	}
+
+	fseek(fp, sizeof(int) + (id - 1) * sizeof(FILM), SEEK_SET);
+	fwrite(film, sizeof(FILM), 1, fp);
+	fclose(fp);
+
     printf("Podaci o filmu su ažurirani.\n");
+
 }
 
 void ispisiFilm(FILM* polje) {
@@ -268,11 +276,11 @@ void ispisiFilm(FILM* polje) {
         return;
     }
 
-    printf("ID   Naslov                        Godina   Žanr               Gledano\n");
+    printf("ID   Naslov                        Godina   Zanr               Gledano\n");
     printf("------------------------------------------------------------------------------\n");
 
     for (i = 0; i < brojFilmova; i++) {
-        printf("%-4d %-30s %-8d %-20s %s", i + 1, (polje + 1)->naslov, (polje + 1)->godina, (polje + 1)->zanr, (polje + 1)->gledano);
+        printf("%d %s %d %s %s", i + 1, (polje + i)->naslov, (polje + i)->godina, (polje + i)->zanr, (polje + i)->gledano); //%-4d %-30s %-8d %-20s %s
     }
 
 }
@@ -286,20 +294,20 @@ void* searchNaslov(FILM* polje) {
     getchar();
     scanf(" %[^\n]", trazeniNaslov);
 
-    if (br != 0) {
-        printf("ID   Naslov                        Godina   Žanr               Gledano\n");
-        printf("------------------------------------------------------------------------------\n");
-    }
+    printf("ID   Naslov                        Godina   Zanr               Gledano\n");
+    printf("------------------------------------------------------------------------------\n");
 
     for (i = 0; i < brojFilmova; i++) {
-        if (!strcmp(trazeniNaslov, (polje + i)->naslov)) {
-            printf("%-4d %-30s %-8d %-20s %s", i + 1, (polje + 1)->naslov, (polje + 1)->godina, (polje + 1)->zanr, (polje + 1)->gledano);
+        if (!strcmp(trazeniNaslov, (polje + i)->naslov) == 0) {
+            printf("%-4d %-30s %-8d %-20s %s\n", i + 1, (polje + 1)->naslov, (polje + 1)->godina, (polje + 1)->zanr, (polje + 1)->gledano);
             br++;
         }
     }
+
     if (br == 0) {
         printf("\nFilm pod unesenim naslovom nije pronaden.\n");
     }
+
     return NULL;
 
 }
@@ -312,25 +320,26 @@ void* searchGodina(FILM* polje) {
     printf("Unesite godinu koju trazite:\n");
     scanf("%d", &trazenaGodina);
 
-    if (br != 0) {
-        printf("ID   Naslov                        Godina   Žanr               Gledano\n");
-        printf("------------------------------------------------------------------------------\n");
-    }
-
+    printf("ID   Naslov                        Godina   Zanr               Gledano\n");
+    printf("------------------------------------------------------------------------------\n");
+   
     for (i = 0; i < brojFilmova; i++) {
         if (trazenaGodina == (polje + i)->godina) {
-            printf("%-4d %-30s %-8d %-20s %s", i + 1, (polje + 1)->naslov, (polje + 1)->godina, (polje + 1)->zanr, (polje + 1)->gledano);
+            printf("%-4d %-30s %-8d %-20s %s\n", i + 1, (polje + 1)->naslov, (polje + 1)->godina, (polje + 1)->zanr, (polje + 1)->gledano);
             br++;
         }
     }
+
     if (br == 0) {
         printf("\nTrazena godina nije pronadena.\n");
     }
+
     return NULL;
 
 }
 
 void* searchZanr(FILM* polje) {
+
     char trazeniZanr[50];
     int br = 0;
 
@@ -338,21 +347,22 @@ void* searchZanr(FILM* polje) {
     getchar();
     scanf(" %[^\n]", trazeniZanr);
 
-    if (br != 0) {
-        printf("ID   Naslov                        Godina   Žanr               Gledano\n");
-        printf("------------------------------------------------------------------------------\n");
-    }
+    printf("ID   Naslov                        Godina   Zanr               Gledano\n");
+    printf("------------------------------------------------------------------------------\n");
 
     for (i = 0; i < brojFilmova; i++) {
-        if (!strcmp(trazeniZanr, (polje + i)->zanr)) {
+        if (!strcmp(trazeniZanr, (polje + i)->zanr) == 0) {
             printf("%-4d %-30s %-8d %-20s %s", i + 1, (polje + 1)->naslov, (polje + 1)->godina, (polje + 1)->zanr, (polje + 1)->gledano);
             br++;
         }
     }
+
     if (br == 0) {
         printf("\nFilm sa ovim zanrom nije pronaden.\n");
     }
+
     return NULL;
+
 }
 
 void* searchGledano(FILM* polje) {
@@ -364,20 +374,20 @@ void* searchGledano(FILM* polje) {
     getchar();
     scanf(" %[^\n]", trazeniPogIliNepogFilm);
 
-    if (br != 0) {
-        printf("ID   Naslov                        Godina   Žanr               Gledano\n");
-        printf("------------------------------------------------------------------------------\n");
-    }
+    printf("ID   Naslov                        Godina   Zanr               Gledano\n");
+    printf("------------------------------------------------------------------------------\n");
 
     for (i = 0; i < brojFilmova; i++) {
-        if (!strcmp(trazeniPogIliNepogFilm, (polje + i)->gledano)) {
+        if (!strcmp(trazeniPogIliNepogFilm, (polje + i)->gledano) == 0) {
             printf("%-4d %-30s %-8d %-20s %s", i + 1, (polje + 1)->naslov, (polje + 1)->godina, (polje + 1)->zanr, (polje + 1)->gledano);
             br++;
         }
     }
+
     if (br == 0) {
-        printf("\nNema unesenih %s filmova.\n", strcmp(trazeniPogIliNepogFilm, "pogledani") ? "nepogledanih" : "pogledanih");
+        printf("\nNema unesenih %s filmova.\n", strcmp(trazeniPogIliNepogFilm, "da") == 0 ? "pogledanih" : "nepogledanih");
     }
+
     return NULL;
 
 }
@@ -392,7 +402,7 @@ void selectionSortGodinaUzl(FILM* polje) {
         }
     }
 
-    printf("ID   Naslov                        Godina   Žanr               Gledano\n");
+    printf("ID   Naslov                        Godina   Zanr               Gledano\n");
     printf("------------------------------------------------------------------------------\n");
 
     for (i = 0; i < brojFilmova; i++) {
@@ -413,7 +423,7 @@ void selectionSortGodinaSil(FILM* polje) {
         }
     }
 
-    printf("ID   Naslov                        Godina   Žanr               Gledano\n");
+    printf("ID   Naslov                        Godina   Zanr               Gledano\n");
     printf("------------------------------------------------------------------------------\n");
 
     for (i = 0; i < brojFilmova; i++) {
@@ -444,35 +454,39 @@ void subZaSortSil(FILM* veci, FILM* manji) {
 
 void brisanjeFilma(FILM* polje) {
     
-    FILE* fp = NULL;
-    fp = fopen("filmovi.bin", "wb");
+	int id;
+	printf("Unesite ID filma koji želite izbrisati: ");
+	scanf("%d", &id);
+
+	if (id < 1 || id > brojFilmova) {
+		printf("Neispravan ID filma.\n");
+		return;
+	}
+
+	for (int i = id - 1; i < brojFilmova - 1; i++) {
+		polje[i] = polje[i + 1];
+	}
+	brojFilmova--;
+
+    FILE* fp = fopen("filmovi.bin", "wb");
     if (fp == NULL) {
         perror("Pogreska pri brisanju filma.");
+		return;
     }
-    rewind(fp);
-    fseek(fp, sizeof(int), SEEK_CUR);
-
-    int id;
-    printf("Unesite ID filma koji želite izbrisati: ");
-    scanf("%d", &id);
-
-    if (id < 1 || id > brojFilmova) {
-        printf("Neispravan ID filma.\n");
-        return;
-    }
-
-    for (int i = id - 1; i < brojFilmova - 1; i++) {
-        polje[i] = polje[i + 1];
-    }
-    brojFilmova--;
+	
+	fwrite(&brojFilmova, sizeof(int), 1, fp);
+	fwrite(polje, sizeof(FILM), brojFilmova, fp);
+	fclose(fp);
 
     printf("Film je uspješno obrisan.\n");
 
 }
 
 void izlaz() {
+
     char izbor[3];                                                
     printf("Zelite li izaci iz programa? (da/ne)\n");
+
     while (1) {
         scanf(" %2s", izbor);
         if (strcmp(izbor, "da") == 0) {
@@ -487,4 +501,5 @@ void izlaz() {
             printf("\nUnesite 'da' ili 'ne':\n");
         }
     }
+
 }
