@@ -7,7 +7,7 @@ typedef struct film {
     char naslov[100];
     int godina;
     char zanr[50];
-    char gledano[3];
+    char gledano[4];
 } FILM;
 
 int izbornik();
@@ -15,8 +15,8 @@ int izbornikPret();
 int izbornikSort();
 void kreiranjeDat();
 void unesiFilm();
-FILM* ucitajFilm();
-void urediPodatke();
+void* ucitajFilm();
+void urediPodatke(FILM* polje);
 void ispisiFilm(FILM* polje);
 void* searchNaslov(FILM* polje);
 void* searchGodina(FILM* polje);
