@@ -6,11 +6,11 @@
 
 int main() {
 
-    int izbor = 1;
+	int izbor = 1;
 
-    while (izbor != 999) {
-        izbor = izbornik();
-    }
+	while (1) {
+		izbor = izbornik();
+	}
 
-    return 0;
+	return 0;
 }
