@@ -1,4 +1,3 @@
-
 #define _CRT_SECURE_NO_WARNINGS
 
 #include <stdio.h>
@@ -12,7 +11,7 @@ static int i;
 int izbornik() {
 
 	int izbor = 0;
-	static FILM* polje = NULL;
+	FILM* polje = NULL;
 
 	printf("\n######## IZBORNIK ########\n");
 	printf("1. Unos novog filma\n");
@@ -24,14 +23,8 @@ int izbornik() {
 	printf("7. Izlaz\n");
 	printf("##########################\n");
 	printf("\nIzbor: ");
-	
+
 	scanf("%d", &izbor);
-	/*do {
-		getchar();
-		if (izbor < 1 || izbor > 7) {
-			printf("Nepoznata opcija, molimo odaberite ponovno.\n");
-		}
-	} while (izbor < 1 || izbor > 7);*/
 	system("cls");
 
 	switch (izbor) {
@@ -44,29 +37,46 @@ int izbornik() {
 
 	case 2:
 		polje = ucitajFilm();
-		urediPodatke(polje);
+		if (polje != NULL) {
+			urediPodatke(polje);
+			free(polje);
+		}
 		break;
 
 	case 3:
 		polje = ucitajFilm();
-		ispisiFilm(polje);
+		if (polje != NULL) {
+			ispisiFilm(polje);
+			free(polje);
+		}
 		break;
 
 	case 4:
-		while (izbor != 997) {
-			izbor = izbornikPret();
+		polje = ucitajFilm();
+		if (polje != NULL) {
+			while (izbor != 997) {
+				izbor = izbornikPret(polje);
+			}
+			free(polje);
 		}
 		break;
 
 	case 5:
-		while (izbor != 998) {
-			izbor = izbornikSort();
+		polje = ucitajFilm();
+		if (polje != NULL) {
+			while (izbor != 998) {
+				izbor = izbornikSort(polje);
+			}
+			free(polje);
 		}
 		break;
 
 	case 6:
 		polje = ucitajFilm();
-		brisanjeFilma(polje);
+		if (polje != NULL) {
+			brisanjeFilma(polje);
+			free(polje);
+		}
 		break;
 
 	case 7:
@@ -81,11 +91,9 @@ int izbornik() {
 
 }
 
-int izbornikPret() {
+int izbornikPret(FILM* polje) {
 
 	int izbor = 0;
-	FILM* polje = NULL;
-	polje = ucitajFilm();
 
 	printf("\n### Pretrazivanje ###\n");
 	printf("1. Naslov\n");
@@ -127,11 +135,9 @@ int izbornikPret() {
 
 }
 
-izbornikSort() {
+izbornikSort(FILM* polje) {
 
 	int izbor = 0;
-	FILM* polje = NULL;
-	polje = ucitajFilm();
 
 	printf("\n### Sortiraj po: ###\n");
 	printf("1. Godini uzlazno\n");
@@ -214,19 +220,26 @@ void* ucitajFilm() {
 		return NULL;
 	}
 
-	FILM* polje = NULL;
-	polje = (FILM*)malloc(brojFilmova * sizeof(FILM));
+	brojFilmova = 0;
+	char ch;
+	while ((ch = fgetc(fp)) != EOF) {
+		if (ch == '\n') {
+			brojFilmova++;
+		}
+	}
+	rewind(fp);
 
+	FILM* polje = (FILM*)malloc(brojFilmova * sizeof(FILM));
 	if (polje == NULL) {
 		perror("Neuspjesno zauzimanje memorije");
+		fclose(fp);
 		return NULL;
 	}
 
 	int i = 0;
-	while (fscanf(fp, " %99[^,],%d,%49[^,],%3s\n", polje[i].naslov, &polje[i].godina, polje[i].zanr, polje[i].gledano) == 4) {
+	while (i < brojFilmova && fscanf(fp, " %99[^,],%d,%49[^,],%3s\n", polje[i].naslov, &polje[i].godina, polje[i].zanr, polje[i].gledano) == 4) {
 		i++;
 	}
-	brojFilmova = i;
 
 	fclose(fp);
 	return polje;
@@ -441,7 +454,7 @@ void selectionSortGodinaSil(FILM* polje) {
 
 }
 
-void subZaSortUzl(FILM* manji, FILM* veci) {
+inline void subZaSortUzl(FILM* manji, FILM* veci) {
 
 	FILM temp = *manji;
 	*manji = *veci;
@@ -449,7 +462,7 @@ void subZaSortUzl(FILM* manji, FILM* veci) {
 
 }
 
-void subZaSortSil(FILM* veci, FILM* manji) {
+inline void subZaSortSil(FILM* veci, FILM* manji) {
 
 	FILM temp = *veci;
 	*veci = *manji;
@@ -506,7 +519,7 @@ void izlaz() {
 			return;
 		}
 		else {
-			printf("\nUnesite 'da' ili 'ne'");
+			printf("\nUnesite 'da' ili 'ne'\n");
 		}
 	}
 
