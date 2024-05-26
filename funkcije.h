@@ -11,8 +11,8 @@ typedef struct film {
 } FILM;
 
 int izbornik();
-int izbornikPret();
-int izbornikSort();
+int izbornikPret(FILM* polje);
+int izbornikSort(FILM* polje);
 void kreiranjeDat();
 void unesiFilm();
 void* ucitajFilm();
@@ -24,8 +24,8 @@ void* searchZanr(FILM* polje);
 void* searchGledano(FILM* polje);
 void selectionSortGodinaUzl(FILM* polje);
 void selectionSortGodinaSil(FILM* polje);
-void subZaSortUzl(FILM* manji, FILM* veci);
-void subZaSortSil(FILM* veci, FILM* manji);
+inline void subZaSortUzl(FILM* manji, FILM* veci);
+inline void subZaSortSil(FILM* veci, FILM* manji);
 void brisanjeFilma(FILM* polje);
 void izlaz();
 
