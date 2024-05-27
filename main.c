@@ -6,10 +6,8 @@
 
 int main() {
 
-	int izbor = 1;
-
 	while (1) {
-		izbor = izbornik();
+		izbornik();
 	}
 
 	return 0;
