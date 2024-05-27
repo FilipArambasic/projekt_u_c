@@ -8,9 +8,9 @@
 static int brojFilmova = 0;
 static int i;
 
-int izbornik() {
+void izbornik() {
 
-	int izbor = 0;
+	char izbor[4];
 	FILM* polje = NULL;
 
 	printf("\n######## IZBORNIK ########\n");
@@ -24,18 +24,37 @@ int izbornik() {
 	printf("##########################\n");
 	printf("\nIzbor: ");
 
-	scanf("%d", &izbor);
+	do {
+		if (fgets(izbor, sizeof(izbor), stdin) == NULL) {
+			continue;
+		}
+
+		if (strchr(izbor, '\n') == NULL) {
+			ocistiBuffer();
+		}
+
+		if (strlen(izbor) != 2 || (izbor[0] < '1' || izbor[0] > '7')) {
+			printf("\nNepoznata opcija, molimo odaberite ponovno: ");
+			continue;
+		}
+
+		if ((izbor[0] == '1' || izbor[0] == '2' || izbor[0] == '3' || izbor[0] == '4' || izbor[0] == '5' || izbor[0] == '6' || izbor[0] == '7')) {
+			break;
+		}
+
+	} while (1);
+	
 	system("cls");
 
-	switch (izbor) {
-	case 1:
+	switch (izbor[0]) {
+	case '1':
 		if (brojFilmova == 0) {
 			kreiranjeDat();
 		}
 		unesiFilm();
 		break;
 
-	case 2:
+	case '2':
 		polje = ucitajFilm();
 		if (polje != NULL) {
 			urediPodatke(polje);
@@ -43,7 +62,7 @@ int izbornik() {
 		}
 		break;
 
-	case 3:
+	case '3':
 		polje = ucitajFilm();
 		if (polje != NULL) {
 			ispisiFilm(polje);
@@ -51,27 +70,23 @@ int izbornik() {
 		}
 		break;
 
-	case 4:
+	case '4':
 		polje = ucitajFilm();
 		if (polje != NULL) {
-			while (izbor != 997) {
-				izbor = izbornikPret(polje);
-			}
+			izbornikPret(polje);
+		}
+		free(polje);
+		break;
+
+	case '5':
+		polje = ucitajFilm();
+		if (polje != NULL) {
+			izbornikSort(polje);
 			free(polje);
 		}
 		break;
 
-	case 5:
-		polje = ucitajFilm();
-		if (polje != NULL) {
-			while (izbor != 998) {
-				izbor = izbornikSort(polje);
-			}
-			free(polje);
-		}
-		break;
-
-	case 6:
+	case '6':
 		polje = ucitajFilm();
 		if (polje != NULL) {
 			brisanjeFilma(polje);
@@ -79,7 +94,7 @@ int izbornik() {
 		}
 		break;
 
-	case 7:
+	case '7':
 		izlaz();
 		break;
 
@@ -87,13 +102,12 @@ int izbornik() {
 		printf("Nepoznata opcija, molimo odaberite ponovno.\n");
 	}
 
-	return izbor;
 
 }
 
-int izbornikPret(FILM* polje) {
+void izbornikPret(FILM* polje) {
 
-	int izbor = 0;
+	char izbor[4];
 
 	printf("\n### Pretrazivanje ###\n");
 	printf("1. Naslov\n");
@@ -104,40 +118,57 @@ int izbornikPret(FILM* polje) {
 	printf("#####################\n");
 	printf("\nIzbor: ");
 
-	scanf("%d", &izbor);
+	do {
+		if (fgets(izbor, sizeof(izbor), stdin) == NULL) {
+			continue;
+		}
+
+		if (strchr(izbor, '\n') == NULL) {
+			ocistiBuffer();
+		}
+
+		if (strlen(izbor) != 2 || (izbor[0] < '1' || izbor[0] > '5')) {
+			printf("\nNepoznata opcija, molimo odaberite ponovno: ");
+			continue;
+		}
+
+		if ((izbor[0] == '1' || izbor[0] == '2' || izbor[0] == '3' || izbor[0] == '4' || izbor[0] == '5')) {
+			break;
+		}
+
+	} while (1);
+
 	system("cls");
 
-	switch (izbor) {
-	case 1:
+	switch (izbor[0]) {
+	case '1':
 		searchNaslov(polje);
 		break;
 
-	case 2:
+	case '2':
 		searchGodina(polje);
 		break;
 
-	case 3:
+	case '3':
 		searchZanr(polje);
 		break;
 
-	case 4:
+	case '4':
 		searchGledano(polje);
 		break;
 
-	case 5:
-		return 997;
+	case '5':
+		return;
 
 	default:
 		printf("Nepoznata opcija, molimo odaberite ponovno.\n");
 	}
 
-	return izbor;
-
 }
 
-izbornikSort(FILM* polje) {
+void izbornikSort(FILM* polje) {
 
-	int izbor = 0;
+	char izbor[4];
 
 	printf("\n### Sortiraj po: ###\n");
 	printf("1. Godini uzlazno\n");
@@ -146,10 +177,29 @@ izbornikSort(FILM* polje) {
 	printf("####################\n");
 	printf("\nIzbor: ");
 
-	scanf("%d", &izbor);
+	do {
+		if (fgets(izbor, sizeof(izbor), stdin) == NULL) {
+			continue;
+		}
+
+		if (strchr(izbor, '\n') == NULL) {
+			ocistiBuffer();
+		}
+
+		if (strlen(izbor) != 2 || (izbor[0] < '1' || izbor[0] > '3')) {
+			printf("\nNepoznata opcija, molimo odaberite ponovno: ");
+			continue;
+		}
+
+		if ((izbor[0] == '1' || izbor[0] == '2' || izbor[0] == '3')) {
+			break;
+		}
+
+	} while (1);
+
 	system("cls");
 
-	switch (izbor) {
+	switch (izbor[0]) {
 	case 1:
 		selectionSortGodinaUzl(polje);
 		break;
@@ -159,19 +209,16 @@ izbornikSort(FILM* polje) {
 		break;
 
 	case 3:
-		return 998;
+		return;
 
 	default:
 		printf("Nepoznata opcija, molimo odaberite ponovno.\n");
 	}
-
-	return izbor;
-
 }
 
 void kreiranjeDat() {
 
-	FILE* fp = fopen("filmovi.txt", "wb");
+	FILE* fp = fopen("filmovi.txt", "w");
 
 	if (fp == NULL) {
 		perror("Greska pri otvaranju datoteke");
@@ -522,5 +569,11 @@ void izlaz() {
 			printf("\nUnesite 'da' ili 'ne'\n");
 		}
 	}
+
+}
+
+void ocistiBuffer() {
+	int c;
+	while ((c = getchar()) != '\n' && c != EOF);
 
 }
