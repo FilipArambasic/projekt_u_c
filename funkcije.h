@@ -10,9 +10,9 @@ typedef struct film {
     char gledano[4];
 } FILM;
 
-int izbornik();
-int izbornikPret(FILM* polje);
-int izbornikSort(FILM* polje);
+void izbornik();
+void izbornikPret(FILM* polje);
+void izbornikSort(FILM* polje);
 void kreiranjeDat();
 void unesiFilm();
 void* ucitajFilm();
@@ -28,5 +28,6 @@ inline void subZaSortUzl(FILM* manji, FILM* veci);
 inline void subZaSortSil(FILM* veci, FILM* manji);
 void brisanjeFilma(FILM* polje);
 void izlaz();
+void ocistiBuffer();
 
 #endif /* FUNKCIJE_H */
