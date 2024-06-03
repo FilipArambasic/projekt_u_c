@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include "funkcije.h"
 
+char pocetniTekst[] = "Dobrodosli u program za upravljanje filmovima!\n";
+
 int main() {
 
 	while (1) {
