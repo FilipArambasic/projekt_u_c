@@ -4,11 +4,13 @@
 #define FUNKCIJE_H
 
 typedef struct film {
-    char naslov[100];
-    int godina;
-    char zanr[50];
-    char gledano[4];
+	char naslov[100];
+	int godina;
+	char zanr[50];
+	char gledano[4];
 } FILM;
+
+extern char pocetniTekst[];
 
 void izbornik();
 void izbornikPret(FILM* polje);
