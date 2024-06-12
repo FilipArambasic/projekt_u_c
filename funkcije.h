@@ -30,6 +30,7 @@ inline void subZaSortUzl(FILM* manji, FILM* veci);
 inline void subZaSortSil(FILM* veci, FILM* manji);
 void brisanjeFilma(FILM* polje);
 void izlaz();
+void brisanjeDat();
 void ocistiBuffer();
 
 #endif /* FUNKCIJE_H */
