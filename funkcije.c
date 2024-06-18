@@ -1,3 +1,4 @@
+
 #define _CRT_SECURE_NO_WARNINGS
 
 #include <stdio.h>
@@ -97,7 +98,7 @@ void izbornik() {
 			polje = ucitajFilm();
 			if (polje != NULL) {
 				brisanjeFilma(polje);
-				free(polje);				
+				free(polje);
 				polje = NULL;
 			}
 			break;
@@ -295,7 +296,7 @@ void unesiFilm() {
 		printf("Unesite je li film pogledan (da/ne): ");
 		validUnos = scanf(" %3s", noviFilm.gledano);
 		ocistiBuffer();
-		
+
 		if (validUnos != 1 || (strcmp(noviFilm.gledano, "da") != 0 && strcmp(noviFilm.gledano, "ne") != 0)) {
 			printf("\nNeispravan unos statusa pogledanosti filma.\n");
 		}
@@ -455,7 +456,7 @@ void ispisiFilm(FILM* polje) {
 }
 
 void* searchNaslov(FILM* polje) {
-	
+
 	if (polje == NULL) {
 		printf("Greska: NULL pokazivac na polje filmova.\n");
 		return NULL;
@@ -565,18 +566,24 @@ void* searchGledano(FILM* polje) {
 	int br = 0;
 
 	printf("Unesite (da) za pogledane ili (ne) za nepogledane filmove: ");
-	fgets(trazeniPogIliNepogFilm, sizeof(trazeniPogIliNepogFilm), stdin);
-	trazeniPogIliNepogFilm[strcspn(trazeniPogIliNepogFilm, "\n")] = '\0';
+	if (fgets(trazeniPogIliNepogFilm, sizeof(trazeniPogIliNepogFilm), stdin) != NULL) {
+		trazeniPogIliNepogFilm[strcspn(trazeniPogIliNepogFilm, "\n")] = '\0';
+	}
+	else {
+		printf("Greska pri unosu.\n");
+		return NULL;
+	}
 
-	if (strlen(trazeniPogIliNepogFilm) != 2 || strcmp(trazeniPogIliNepogFilm, "da") != 0 && strcmp(trazeniPogIliNepogFilm, "ne") != 0) {
-        printf("Greska pri unosu.\n");
-        return NULL;
-    }
+	if (strlen(trazeniPogIliNepogFilm) != 2 || (strcmp(trazeniPogIliNepogFilm, "da") != 0 && strcmp(trazeniPogIliNepogFilm, "ne") != 0)) {
+		printf("Greska pri unosu.\n");
+		ocistiBuffer();
+		return NULL;
+	}
 
 	printf("ID   Naslov                                            Godina   Zanr                          Gledano\n");
 	printf("-------------------------------------------------------------------------------------------------------------\n");
 
-	for (i = 0; i < brojFilmova; i++) {
+	for (int i = 0; i < brojFilmova; i++) {
 		if (strcmp(trazeniPogIliNepogFilm, (polje + i)->gledano) == 0) {
 			printf("%-4d %-50s %-7d %-30s  %s\n", i + 1, (polje + i)->naslov, (polje + i)->godina, (polje + i)->zanr, (polje + i)->gledano);
 			br++;
@@ -586,9 +593,9 @@ void* searchGledano(FILM* polje) {
 	if (br == 0) {
 		printf("\nNema unesenih %s filmova.\n", strcmp(trazeniPogIliNepogFilm, "da") == 0 ? "pogledanih" : "nepogledanih");
 	}
-	
+
 	return NULL;
-	
+
 }
 
 void bubbleSortGodinaUzl(FILM* polje) {
@@ -680,6 +687,7 @@ void brisanjeFilma(FILM* polje) {
 
 	if (id < 1 || id > brojFilmova) {
 		printf("Neispravan ID filma.\n");
+		ocistiBuffer();
 		return;
 	}
 
