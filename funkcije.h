@@ -4,9 +4,9 @@
 #define FUNKCIJE_H
 
 typedef struct film {
-	char naslov[100];
+	char naslov[50];
 	int godina;
-	char zanr[50];
+	char zanr[30];
 	char gledano[4];
 } FILM;
 
