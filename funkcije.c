@@ -221,11 +221,11 @@ void izbornikSort(FILM* polje) {
 
 		switch (izbor[0]) {
 		case '1':
-			selectionSortGodinaUzl(polje);
+			bubbleSortGodinaUzl(polje);
 			break;
 
 		case '2':
-			selectionSortGodinaSil(polje);
+			bubbleSortGodinaSil(polje);
 			break;
 
 		case '3':
@@ -257,7 +257,7 @@ void unesiFilm() {
 
 	FILE* fp = fopen("filmovi.txt", "a");
 	if (fp == NULL) {
-		perror("Neuspjesni unos");
+		perror("Greška pri otvaranju datoteke");
 		exit(1);
 	}
 
@@ -335,7 +335,9 @@ void* ucitajFilm() {
 	FILM* polje = (FILM*)malloc(brojFilmova * sizeof(FILM));
 	if (polje == NULL) {
 		perror("Neuspjesno zauzimanje memorije");
-		fclose(fp);
+		if (fclose(fp) != 0) {
+			perror("Greska pri zatvaranju datoteke");
+		}
 		return NULL;
 	}
 
@@ -589,7 +591,7 @@ void* searchGledano(FILM* polje) {
 	
 }
 
-void selectionSortGodinaUzl(FILM* polje) {
+void bubbleSortGodinaUzl(FILM* polje) {
 
 	if (polje == NULL) {
 		printf("Greska: NULL pokazivac na polje filmova.\n");
@@ -614,7 +616,7 @@ void selectionSortGodinaUzl(FILM* polje) {
 
 }
 
-void selectionSortGodinaSil(FILM* polje) {
+void bubbleSortGodinaSil(FILM* polje) {
 
 	if (polje == NULL) {
 		printf("Greska: NULL pokazivac na polje filmova.\n");
